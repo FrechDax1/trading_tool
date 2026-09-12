@@ -1,0 +1,5 @@
+*.log
+.*.lock
+ergebnisse_latest.sql
+__pycache__/
+*.pyc

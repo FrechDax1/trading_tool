@@ -1,0 +1,4 @@
+INSERT INTO market_sentiment (date, source, symbol, value) VALUES ('2026-09-08', 'CBOE', 'EQUITY_PC', 0.48) ON DUPLICATE KEY UPDATE value = VALUES(value);
+INSERT INTO market_sentiment (date, source, symbol, value) VALUES ('2026-09-09', 'CBOE', 'EQUITY_PC', 0.67) ON DUPLICATE KEY UPDATE value = VALUES(value);
+INSERT INTO market_sentiment (date, source, symbol, value) VALUES ('2026-09-10', 'CBOE', 'EQUITY_PC', 0.60) ON DUPLICATE KEY UPDATE value = VALUES(value);
+INSERT INTO market_sentiment (date, source, symbol, value) VALUES ('2026-09-11', 'CBOE', 'EQUITY_PC', 0.58) ON DUPLICATE KEY UPDATE value = VALUES(value);
