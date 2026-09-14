@@ -1,5 +1,9 @@
 *.log
+*.log-*
+*.log-*.gz
+*.lock
 .*.lock
+*.xls
 ergebnisse_latest.sql
 __pycache__/
 *.pyc
