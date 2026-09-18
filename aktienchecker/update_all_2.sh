@@ -30,18 +30,32 @@ VENV_DIR="/home/carsten/my_python"
 PYTHON="$VENV_DIR/bin/python"
 PY_SCRIPT="$SCRIPT_DIR/get_lastdates.py"
 
-tickers=(
-    "^GDAXI"
-    "^GSPC"
-    "^NDX"
-    "^990100-USD-STRD"
-    "^VIX"
-    "^N225"
-    "^RUT"
-    "^STOXX"
-    "EEM"
-    "AAXJ"
-)
+# Ticker-Liste kommt aus der Tabelle ticker_symbols (alle Zeilen, nicht nur
+# aktive - anders als beim stuendlichen Lauf in run_hourly.sh). Es wird
+# yahoo_symbol verwendet, weil get_lastdates.py diesen Wert direkt an
+# yf.download() weiterreicht und zugleich (wegen index_prices.Ticker
+# varchar(10)) als - auf 10 Zeichen abgeschnittenen - Ticker in die
+# Datenbank schreibt; das entspricht dem bisherigen Verhalten der
+# fest kodierten Liste.
+TICKERS_RAW="$(mysql -N -B -e "
+    SELECT yahoo_symbol
+    FROM ticker_symbols
+    WHERE yahoo_symbol IS NOT NULL
+    ORDER BY ticker_symbol
+")"
+mysql_query_status=$?
+
+if [ $mysql_query_status -ne 0 ]; then
+    echo "FEHLER: Ticker-Liste konnte nicht aus ticker_symbols gelesen werden (mysql Exit-Code ${mysql_query_status})."
+    exit 1
+fi
+
+if [ -z "$TICKERS_RAW" ]; then
+    echo "Keine Ticker in ticker_symbols gefunden."
+    exit 1
+fi
+
+mapfile -t tickers <<< "$TICKERS_RAW"
 
 # venv aktivieren (set -u kurz aus, weil manche activate-Skripte auf
 # nicht gesetzte Variablen zugreifen und sonst abbrechen würden)
@@ -54,6 +68,7 @@ set -u
 fail_count=0
 
 for ticker in "${tickers[@]}"; do
+    [ -z "$ticker" ] && continue
     echo "Verarbeite Ticker $ticker..."
     if "$PYTHON" "$PY_SCRIPT" --ticker "$ticker"; then
         echo "OK: $ticker"
